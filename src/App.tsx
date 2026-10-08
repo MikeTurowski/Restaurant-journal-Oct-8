@@ -1,4 +1,5 @@
 import { RouterProvider } from 'react-router'
+import { AuthProvider } from '@/auth/AuthContext'
 import { RepositoryProvider } from '@/data/RepositoryContext'
 import { SavedProvider } from '@/hooks/useSaved'
 import { router } from './router'
@@ -6,9 +7,11 @@ import { router } from './router'
 export default function App() {
   return (
     <RepositoryProvider>
-      <SavedProvider>
-        <RouterProvider router={router} />
-      </SavedProvider>
+      <AuthProvider>
+        <SavedProvider>
+          <RouterProvider router={router} />
+        </SavedProvider>
+      </AuthProvider>
     </RepositoryProvider>
   )
 }

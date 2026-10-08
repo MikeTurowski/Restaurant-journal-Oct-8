@@ -4,16 +4,25 @@ import {
   mockOptionsFromSearch,
 } from './mockRestaurantRepository'
 import type { RestaurantRepository } from './repository'
+import { getSupabaseClient } from './supabaseClient'
+import { createSupabaseRestaurantRepository } from './supabaseRestaurantRepository'
 
 const RepositoryContext = createContext<RestaurantRepository | null>(null)
 
 /**
  * Single place that chooses which repository the app uses.
- * To go live: build a SupabaseRestaurantRepository and return it here
- * (e.g. when import.meta.env.VITE_SUPABASE_URL is set).
+ * Supabase when VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set, otherwise the
+ * mock data. Add `?data=mock` to the URL to force the mock repository (demo/offline).
  */
 function createDefaultRepository(): RestaurantRepository {
-  return createMockRestaurantRepository(mockOptionsFromSearch(window.location.search))
+  const { search } = window.location
+  const client = getSupabaseClient()
+  const forceMock = new URLSearchParams(search).get('data') === 'mock'
+
+  if (client && !forceMock) {
+    return createSupabaseRestaurantRepository({ client })
+  }
+  return createMockRestaurantRepository(mockOptionsFromSearch(search))
 }
 
 export function RepositoryProvider({

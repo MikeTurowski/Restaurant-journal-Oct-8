@@ -7,6 +7,7 @@ import {
   useState,
   type ReactNode,
 } from 'react'
+import { useAuth } from '@/auth/AuthContext'
 import { useRepository } from '@/data/RepositoryContext'
 
 interface SavedContextValue {
@@ -24,55 +25,70 @@ const SavedContext = createContext<SavedContextValue | null>(null)
 
 export function SavedProvider({ children }: { children: ReactNode }) {
   const repository = useRepository()
-  const [ids, setIds] = useState<string[]>([])
-  const [loading, setLoading] = useState(true)
+  const { status, user } = useAuth()
+  // `undefined` while we don't yet know whether someone is signed in.
+  const userId = status === 'loading' ? undefined : (user?.id ?? null)
+
+  // Ids are tagged with the account they belong to, so a different user (or signing
+  // out) never briefly sees someone else's list while the new one loads.
+  const [loaded, setLoaded] = useState<{ owner: string | null; ids: string[] } | null>(
+    null,
+  )
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    if (userId === undefined) return
     let cancelled = false
     repository.listSavedRestaurantIds().then(
-      (saved) => {
-        if (cancelled) return
-        setIds(saved)
-        setLoading(false)
+      (ids) => {
+        if (!cancelled) setLoaded({ owner: userId, ids })
       },
       () => {
-        if (cancelled) return
-        setLoading(false)
+        if (!cancelled) setLoaded({ owner: userId, ids: [] })
       },
     )
     return () => {
       cancelled = true
     }
-  }, [repository])
+  }, [repository, userId])
+
+  const ready = userId !== undefined && loaded?.owner === userId
+  const ids = useMemo(() => (ready ? loaded.ids : []), [ready, loaded])
 
   const toggleSaved = useCallback(
     (id: string) => {
+      if (userId === undefined || !ready) return
       const previous = ids
       // Optimistic update, rolled back if the repository rejects.
-      setIds(previous.includes(id) ? previous.filter((x) => x !== id) : [...previous, id])
-      setError(null)
-      repository.toggleSaved(id).then(setIds, (reason: unknown) => {
-        setIds(previous)
-        setError(
-          reason instanceof Error ? reason.message : 'Could not update saved places.',
-        )
+      setLoaded({
+        owner: userId,
+        ids: previous.includes(id) ? previous.filter((x) => x !== id) : [...previous, id],
       })
+      setError(null)
+      repository.toggleSaved(id).then(
+        (next) => setLoaded({ owner: userId, ids: next }),
+        (reason: unknown) => {
+          setLoaded({ owner: userId, ids: previous })
+          setError(
+            reason instanceof Error ? reason.message : 'Could not update saved places.',
+          )
+        },
+      )
     },
-    [ids, repository],
+    [ids, ready, repository, userId],
   )
 
   const value = useMemo<SavedContextValue>(() => {
     const set = new Set(ids)
     return {
       savedIds: set,
-      loading,
+      loading: !ready,
       error,
       isSaved: (id) => set.has(id),
       toggleSaved,
       dismissError: () => setError(null),
     }
-  }, [ids, loading, error, toggleSaved])
+  }, [ids, ready, error, toggleSaved])
 
   return <SavedContext.Provider value={value}>{children}</SavedContext.Provider>
 }

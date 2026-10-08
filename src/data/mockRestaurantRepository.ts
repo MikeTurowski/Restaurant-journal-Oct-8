@@ -1,4 +1,5 @@
 import type { Restaurant } from '@/types/restaurant'
+import { createLocalSavedStore, type SavedStorage } from './localSavedStore'
 import { mockRestaurants } from './mockRestaurants'
 import type { RestaurantRepository } from './repository'
 
@@ -10,22 +11,10 @@ export interface MockRepositoryOptions {
   /** When true, every read rejects. Handy for demoing error states. */
   failReads?: boolean
   data?: Restaurant[]
-  storage?: Pick<Storage, 'getItem' | 'setItem'>
+  storage?: SavedStorage
 }
 
 const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms))
-
-function readSaved(storage: MockRepositoryOptions['storage']): string[] {
-  try {
-    const raw = storage?.getItem(SAVED_STORAGE_KEY)
-    const parsed: unknown = raw ? JSON.parse(raw) : []
-    return Array.isArray(parsed)
-      ? parsed.filter((v): v is string => typeof v === 'string')
-      : []
-  } catch {
-    return []
-  }
-}
 
 export function createMockRestaurantRepository(
   options: MockRepositoryOptions = {},
@@ -36,6 +25,8 @@ export function createMockRestaurantRepository(
     data = mockRestaurants,
     storage = typeof localStorage === 'undefined' ? undefined : localStorage,
   } = options
+
+  const saved = createLocalSavedStore(SAVED_STORAGE_KEY, storage)
 
   const simulate = async () => {
     await wait(delayMs)
@@ -54,19 +45,10 @@ export function createMockRestaurantRepository(
     },
     async listSavedRestaurantIds() {
       await wait(Math.min(delayMs, 120))
-      return readSaved(storage)
+      return saved.list()
     },
     async toggleSaved(id) {
-      const current = readSaved(storage)
-      const next = current.includes(id)
-        ? current.filter((x) => x !== id)
-        : [...current, id]
-      try {
-        storage?.setItem(SAVED_STORAGE_KEY, JSON.stringify(next))
-      } catch {
-        throw new Error('Could not save to this browser.')
-      }
-      return next
+      return saved.toggle(id)
     },
   }
 }
@@ -82,5 +64,3 @@ export function mockOptionsFromSearch(search: string): MockRepositoryOptions {
   }
   return options
 }
-
-export const mockRestaurantRepository = createMockRestaurantRepository()

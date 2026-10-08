@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router'
-import { CompassIcon, HeartIcon } from '@/components/ui/icons'
+import { useAuth } from '@/auth/AuthContext'
+import { CompassIcon, HeartIcon, UserIcon } from '@/components/ui/icons'
 import { useSaved } from '@/hooks/useSaved'
 
 const linkBase =
@@ -16,6 +17,7 @@ function navClass({ isActive }: { isActive: boolean }) {
 /** Bottom tab bar on phones; sits in the header on md+ screens. */
 export function MainNav() {
   const { savedIds } = useSaved()
+  const { status } = useAuth()
   return (
     <nav
       aria-label="Main"
@@ -37,6 +39,18 @@ export function MainNav() {
           )}
         </span>
       </NavLink>
+      {status !== 'unavailable' &&
+        (status === 'signedIn' ? (
+          <NavLink to="/account" className={navClass}>
+            <UserIcon width={22} height={22} />
+            Account
+          </NavLink>
+        ) : (
+          <NavLink to="/login" className={navClass}>
+            <UserIcon width={22} height={22} />
+            Sign in
+          </NavLink>
+        ))}
     </nav>
   )
 }

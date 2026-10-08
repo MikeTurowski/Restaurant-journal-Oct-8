@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router'
+import { AuthProvider } from '@/auth/AuthContext'
 import { createMockRestaurantRepository } from '@/data/mockRestaurantRepository'
 import { mockRestaurants } from '@/data/mockRestaurants'
 import { RepositoryProvider } from '@/data/RepositoryContext'
@@ -20,9 +21,11 @@ function renderCard(restaurant: Restaurant) {
   return render(
     <MemoryRouter>
       <RepositoryProvider repository={repository}>
-        <SavedProvider>
-          <RestaurantCard restaurant={restaurant} />
-        </SavedProvider>
+        <AuthProvider service={null}>
+          <SavedProvider>
+            <RestaurantCard restaurant={restaurant} />
+          </SavedProvider>
+        </AuthProvider>
       </RepositoryProvider>
     </MemoryRouter>,
   )
