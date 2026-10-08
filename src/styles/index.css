@@ -1,0 +1,231 @@
+@import 'tailwindcss';
+
+/*
+ * Design tokens
+ * -------------
+ * Semantic colors are CSS variables so light/dark can swap values without
+ * touching components. `@theme inline` exposes them as Tailwind utilities
+ * (bg-surface, text-ink-muted, border-line, …).
+ */
+:root {
+  color-scheme: light dark;
+
+  --c-bg: #f6f4ee;
+  --c-surface: #ffffff;
+  --c-surface-muted: #eeebe1;
+  --c-raised: #ffffff;
+  --c-line: #d9d4c5;
+  --c-ink: #1d2a22;
+  --c-ink-muted: #55615a;
+
+  --c-brand: #2f6b4f;
+  --c-brand-strong: #245640;
+  --c-brand-on: #ffffff;
+  --c-brand-soft: #dcebe1;
+  --c-brand-soft-ink: #1d4a35;
+
+  --c-accent: #b4542a;
+  --c-accent-soft: #fbe9dd;
+  --c-accent-soft-ink: #85391a;
+
+  --c-focus: #1f5fbf;
+  --c-warn-ink: #8a5a00;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --c-bg: #111913;
+    --c-surface: #1a251e;
+    --c-surface-muted: #223028;
+    --c-raised: #31463a;
+    --c-line: #33463b;
+    --c-ink: #e8efe9;
+    --c-ink-muted: #a2b3a8;
+
+    --c-brand: #6fbf94;
+    --c-brand-strong: #8bd0ac;
+    --c-brand-on: #0f2118;
+    --c-brand-soft: #1f3a2c;
+    --c-brand-soft-ink: #bfe6d0;
+
+    --c-accent: #e8956a;
+    --c-accent-soft: #3a2519;
+    --c-accent-soft-ink: #f3c8ad;
+
+    --c-focus: #8db8ff;
+    --c-warn-ink: #e8c36a;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--c-bg);
+  --color-surface: var(--c-surface);
+  --color-surface-muted: var(--c-surface-muted);
+  --color-raised: var(--c-raised);
+  --color-line: var(--c-line);
+  --color-ink: var(--c-ink);
+  --color-ink-muted: var(--c-ink-muted);
+  --color-brand: var(--c-brand);
+  --color-brand-strong: var(--c-brand-strong);
+  --color-brand-on: var(--c-brand-on);
+  --color-brand-soft: var(--c-brand-soft);
+  --color-brand-soft-ink: var(--c-brand-soft-ink);
+  --color-accent: var(--c-accent);
+  --color-accent-soft: var(--c-accent-soft);
+  --color-accent-soft-ink: var(--c-accent-soft-ink);
+  --color-focus: var(--c-focus);
+  --color-warn-ink: var(--c-warn-ink);
+}
+
+@theme {
+  /* Typography */
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Fraunces Variable', ui-serif, Georgia, serif;
+
+  /* Type scale (size / line-height) */
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.1rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.35rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.6rem;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.7rem;
+  --text-xl: 1.375rem;
+  --text-xl--line-height: 1.8rem;
+  --text-2xl: 1.75rem;
+  --text-2xl--line-height: 2.1rem;
+  --text-3xl: 2.25rem;
+  --text-3xl--line-height: 2.6rem;
+
+  /* Radii */
+  --radius-chip: 999px;
+  --radius-control: 0.75rem;
+  --radius-card: 1.125rem;
+
+  /* Elevation */
+  --shadow-card: 0 1px 2px rgb(20 35 25 / 0.06), 0 4px 14px rgb(20 35 25 / 0.06);
+  --shadow-pop: 0 8px 28px rgb(20 35 25 / 0.2);
+
+  /* Motion */
+  --ease-calm: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --animate-shimmer: shimmer 1.6s ease-in-out infinite;
+  --animate-rise: rise 220ms var(--ease-calm) both;
+
+  @keyframes shimmer {
+    0%,
+    100% {
+      opacity: 0.55;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+  body {
+    margin: 0;
+    min-width: 320px;
+    background: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  button,
+  [role='button'],
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Leaflet: category-styled markers and dark-mode tiles */
+.vegan-marker {
+  background: transparent;
+  border: 0;
+}
+.vegan-marker__pin {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  transition: transform 160ms var(--ease-calm);
+}
+.vegan-marker__pin > span {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: 3px solid var(--c-surface);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.35);
+  font-size: 15px;
+  line-height: 1;
+}
+.vegan-marker--fully_vegan .vegan-marker__pin > span {
+  background: var(--c-brand);
+  color: var(--c-brand-on);
+}
+.vegan-marker--vegan_options .vegan-marker__pin > span {
+  background: var(--c-accent-soft);
+  color: var(--c-accent-soft-ink);
+  border-color: var(--c-accent);
+}
+.vegan-marker--active .vegan-marker__pin {
+  transform: scale(1.2);
+}
+.vegan-marker:focus-visible .vegan-marker__pin {
+  outline: 3px solid var(--c-focus);
+}
+@media (prefers-color-scheme: dark) {
+  .leaflet-tile-pane {
+    filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9) saturate(0.7);
+  }
+}
+.leaflet-container {
+  font-family: var(--font-sans);
+  background: var(--c-surface-muted);
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
