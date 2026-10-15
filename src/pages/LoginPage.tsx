@@ -93,7 +93,7 @@ export function LoginPage() {
             Forgot password?
           </Link>
         </div>
-        <Button type="submit" pending={pending} className="w-full">
+        <Button type="submit" variant="action" pending={pending} className="w-full">
           {pending ? 'Signing in…' : 'Sign in'}
         </Button>
       </form>

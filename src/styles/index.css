@@ -28,6 +28,10 @@
   --c-accent-soft: #fbe9dd;
   --c-accent-soft-ink: #85391a;
 
+  --c-action: #1d252c;
+  --c-action-strong: #2b3640;
+  --c-action-on: #ffffff;
+
   --c-focus: #1f5fbf;
   --c-warn-ink: #8a5a00;
 }
@@ -52,6 +56,11 @@
     --c-accent-soft: #3a2519;
     --c-accent-soft-ink: #f3c8ad;
 
+    /* Inverted so the dark button from the design stays visible on dark surfaces. */
+    --c-action: #e8efe9;
+    --c-action-strong: #ffffff;
+    --c-action-on: #111913;
+
     --c-focus: #8db8ff;
     --c-warn-ink: #e8c36a;
   }
@@ -73,6 +82,9 @@
   --color-accent: var(--c-accent);
   --color-accent-soft: var(--c-accent-soft);
   --color-accent-soft-ink: var(--c-accent-soft-ink);
+  --color-action: var(--c-action);
+  --color-action-strong: var(--c-action-strong);
+  --color-action-on: var(--c-action-on);
   --color-focus: var(--c-focus);
   --color-warn-ink: var(--c-warn-ink);
 }
